@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEON RADIO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --neon-pink:   #ff2d78;
+      --neon-cyan:   #00f5ff;
+      --neon-purple: #bf00ff;
+      --bg-dark:     #06000f;
+      --glow-pink:   0 0 8px #ff2d78, 0 0 20px #ff2d7888, 0 0 40px #ff2d7844;
+      --glow-cyan:   0 0 8px #00f5ff, 0 0 20px #00f5ff88, 0 0 40px #00f5ff44;
+    }
+    html, body { height: 100%; background: var(--bg-dark); color: #fff; font-family: 'Share Tech Mono', monospace; overflow: hidden; }
+
+    /* ── FONDO DIFUMINADO ── */
+    #bg-art {
+      position: fixed; inset: 0; z-index: 0;
+      background-size: cover; background-position: center;
+      filter: blur(48px) brightness(0.32) saturate(1.8);
+      transform: scale(1.1);
+      transition: background-image 1.4s ease;
+    }
+    #bg-overlay {
+      position: fixed; inset: 0; z-index: 1;
+      background: linear-gradient(180deg,
+        rgba(6,0,15,0.6) 0%,
+        rgba(13,0,32,0.25) 40%,
+        rgba(6,0,15,0.9) 100%);
+    }
+
+    /* ── GRID RETROWAVE ── */
+    #grid { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+    #grid svg { width: 100%; height: 100%; }
+
+    /* ── SCANLINES ── */
+    #scanlines {
+      position: fixed; inset: 0; z-index: 3; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg, rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 1px,
+        transparent 1px, transparent 3px
+      );
+    }
+
+    /* ── LAYOUT ── */
+    #app {
+      position: relative; z-index: 10;
+      height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+
+    /* ── LOGO ── */
+    .logo {
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: clamp(2rem, 5.5vw, 3.4rem);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--neon-cyan); text-shadow: var(--glow-cyan);
+      margin-bottom: 6px;
+      animation: flicker 9s infinite;
+    }
+    .logo span { color: var(--neon-pink); text-shadow: var(--glow-pink); }
+    .tagline {
+      font-size: 0.68rem; letter-spacing: 0.38em;
+      color: rgba(255,255,255,0.35); text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: rgba(10, 0, 26, 0.76);
+      border: 1px solid rgba(0,245,255,0.22);
+      border-radius: 4px;
+      box-shadow:
+        0 0 0 1px rgba(191,0,255,0.1),
+        inset 0 0 50px rgba(0,0,0,0.45),
+        0 12px 70px rgba(0,0,0,0.75);
+      padding: 30px 34px 26px;
+      width: min(480px, 93vw);
+      display: flex; flex-direction: column; align-items: center; gap: 18px;
+      backdrop-filter: blur(14px);
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-purple), transparent);
+      opacity: 0.65;
+    }
+
+    /* ── ARTWORK ── */
+    .artwork-wrap {
+      width: 155px; height: 155px; border-radius: 3px; overflow: hidden;
+      border: 1px solid rgba(255,45,120,0.45);
+      box-shadow: 0 0 28px rgba(255,45,120,0.28), 0 0 70px rgba(0,0,0,0.65);
+      position: relative; flex-shrink: 0;
+    }
+    #artwork {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: opacity 0.7s ease;
+    }
+    .artwork-wrap::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,45,120,0.1) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    /* ── TRACK INFO ── */
+    .track-info { width: 100%; text-align: center; }
+    #track-title {
+      font-family: 'Orbitron', sans-serif; font-weight: 700;
+      font-size: 0.88rem; letter-spacing: 0.07em; color: #fff;
+      text-shadow: 0 0 12px rgba(255,255,255,0.28);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 5px;
+    }
+    #track-artist {
+      font-size: 0.69rem; letter-spacing: 0.22em;
+      color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,45,120,0.55);
+      text-transform: uppercase;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-wrap { width: 100%; }
+    .progress-bar-bg {
+      width: 100%; height: 3px;
+      background: rgba(255,255,255,0.09);
+      border-radius: 2px; cursor: pointer; position: relative;
+    }
+    #progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+      box-shadow: 0 0 8px var(--neon-pink);
+      border-radius: 2px; transition: width 0.5s linear;
+    }
+    .time-row {
+      display: flex; justify-content: space-between;
+      margin-top: 5px; font-size: 0.61rem;
+      color: rgba(255,255,255,0.3); letter-spacing: 0.1em;
+    }
+
+    /* ── CONTROLS ── */
+    .controls { display: flex; align-items: center; gap: 22px; }
+    .btn {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.5);
+      transition: color 0.2s, transform 0.15s;
+      padding: 4px; display: flex; align-items: center; justify-content: center;
+    }
+    .btn:hover { color: #fff; transform: scale(1.12); }
+    .btn.play-btn {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 1.5px solid rgba(255,45,120,0.45);
+      color: var(--neon-pink);
+      box-shadow: 0 0 18px rgba(255,45,120,0.2), inset 0 0 18px rgba(255,45,120,0.05);
+      transition: all 0.2s;
+    }
+    .btn.play-btn:hover {
+      border-color: var(--neon-pink);
+      box-shadow: var(--glow-pink);
+      transform: scale(1.07);
+    }
+
+    /* ── VOLUME ── */
+    .volume-row { width: 100%; display: flex; align-items: center; gap: 10px; }
+    .vol-icon { color: rgba(255,255,255,0.3); flex-shrink: 0; }
+    #volume-slider {
+      flex: 1; -webkit-appearance: none;
+      height: 3px; background: rgba(255,255,255,0.1);
+      border-radius: 2px; outline: none; cursor: pointer;
+    }
+    #volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 12px; height: 12px;
+      border-radius: 50%; background: var(--neon-cyan);
+      box-shadow: 0 0 7px var(--neon-cyan); cursor: pointer;
+    }
+
+    /* ── STATUS ── */
+    #status {
+      font-size: 0.61rem; letter-spacing: 0.22em;
+      color: rgba(255,255,255,0.25); text-transform: uppercase; min-height: 14px;
+    }
+    #status.active { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+    #status.error  { color: #ff6b6b; }
+
+    /* ── EQ BARS ── */
+    .now-playing-row {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; justify-content: center;
+    }
+    #np-label { font-size: 0.59rem; letter-spacing: 0.28em; color: rgba(255,255,255,0.22); text-transform: uppercase; }
+    .eq { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+    .eq-bar {
+      width: 3px; background: var(--neon-cyan); border-radius: 1px;
+      animation: eq-anim 0.8s ease-in-out infinite alternate; opacity: 0.35;
+    }
+    .eq-bar:nth-child(1){animation-duration:0.6s;}
+    .eq-bar:nth-child(2){animation-duration:0.85s;animation-delay:0.1s;}
+    .eq-bar:nth-child(3){animation-duration:0.5s;animation-delay:0.2s;}
+    .eq-bar:nth-child(4){animation-duration:0.7s;animation-delay:0.05s;}
+    .eq.playing .eq-bar { opacity: 1; box-shadow: 0 0 5px var(--neon-cyan); }
+    @keyframes eq-anim { from{height:3px;} to{height:14px;} }
+
+    /* ── IFRAME OCULTO ── */
+    #sc-wrap { position: fixed; top:-9999px; left:-9999px; width:1px; height:1px; overflow:hidden; }
+
+    /* ── ANIMACIONES ── */
+    @keyframes flicker {
+      0%,95%,100%{opacity:1;} 96%{opacity:0.82;} 97%{opacity:1;} 98.5%{opacity:0.68;} 99%{opacity:1;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- CAPAS DE FONDO -->
+<div id="bg-art"></div>
+<div id="bg-overlay"></div>
+
+<!-- GRID RETRO -->
+<div id="grid">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gfade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#00f5ff" stop-opacity="0"/>
+        <stop offset="55%"  stop-color="#00f5ff" stop-opacity="0.16"/>
+        <stop offset="100%" stop-color="#bf00ff" stop-opacity="0.38"/>
+      </linearGradient>
+    </defs>
+    <!-- Horizontales con perspectiva -->
+    <g stroke="url(#gfade)" stroke-width="0.6">
+      <line x1="0"   y1="900" x2="1440" y2="900"/>
+      <line x1="0"   y1="845" x2="1440" y2="845"/>
+      <line x1="60"  y1="798" x2="1380" y2="798"/>
+      <line x1="130" y1="758" x2="1310" y2="758"/>
+      <line x1="192" y1="724" x2="1248" y2="724"/>
+      <line x1="248" y1="695" x2="1192" y2="695"/>
+      <line x1="298" y1="672" x2="1142" y2="672"/>
+      <line x1="344" y1="652" x2="1096" y2="652"/>
+      <line x1="386" y1="635" x2="1054" y2="635"/>
+      <line x1="424" y1="620" x2="1016" y2="620"/>
+      <line x1="458" y1="608" x2="982"  y2="608"/>
+      <line x1="490" y1="597" x2="950"  y2="597"/>
+      <line x1="520" y1="588" x2="920"  y2="588"/>
+    </g>
+    <!-- Verticales con perspectiva -->
+    <g stroke="url(#gfade)" stroke-width="0.5">
+      <line x1="720" y1="582" x2="0"    y2="900"/>
+      <line x1="720" y1="582" x2="1440" y2="900"/>
+      <line x1="720" y1="582" x2="100"  y2="900"/>
+      <line x1="720" y1="582" x2="1340" y2="900"/>
+      <line x1="720" y1="582" x2="220"  y2="900"/>
+      <line x1="720" y1="582" x2="1220" y2="900"/>
+      <line x1="720" y1="582" x2="340"  y2="900"/>
+      <line x1="720" y1="582" x2="1100" y2="900"/>
+      <line x1="720" y1="582" x2="460"  y2="900"/>
+      <line x1="720" y1="582" x2="980"  y2="900"/>
+      <line x1="720" y1="582" x2="580"  y2="900"/>
+      <line x1="720" y1="582" x2="860"  y2="900"/>
+    </g>
+    <!-- Línea horizonte neón -->
+    <line x1="0" y1="580" x2="1440" y2="580" stroke="#ff2d78" stroke-width="1.2" opacity="0.55"/>
+    <line x1="0" y1="582" x2="1440" y2="582" stroke="#ff2d78" stroke-width="0.4" opacity="0.25"/>
+  </svg>
+</div>
+<div id="scanlines"></div>
+
+<!-- IFRAME SOUNDCLOUD (OCULTO) -->
+<div id="sc-wrap">
+  <iframe id="sc-iframe" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="about:blank"></iframe>
+</div>
+
+<!-- UI PRINCIPAL -->
+<div id="app">
+  <div class="logo">NEON <span>RADIO</span></div>
+  <div class="tagline">◈ electronic · house · electronica ◈</div>
+
+  <div class="card">
+
+    <div class="now-playing-row">
+      <div class="eq" id="eq-bars">
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+        <div class="eq-bar"></div>
+      </div>
+      <span id="np-label">En espera</span>
+    </div>
+
+    <div class="artwork-wrap">
+      <img id="artwork"
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect fill='%23100020'/%3E%3Ctext x='80' y='90' text-anchor='middle' fill='%23bf00ff' font-size='52' font-family='serif'%3E%E2%99%AB%3C/text%3E%3C/svg%3E"
+        alt="Portada"/>
+    </div>
+
+    <div class="track-info">
+      <div id="track-title">— INICIANDO —</div>
+      <div id="track-artist">NEON RADIO</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar-bg" id="progress-bar">
+        <div id="progress-fill"></div>
+      </div>
+      <div class="time-row">
+        <span id="time-cur">0:00</span>
+        <span id="time-dur">0:00</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="btn-prev" title="Anterior">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
+        </svg>
+      </button>
+      <button class="btn play-btn" id="btn-play" title="Reproducir / Pausar">
+        <svg id="icon-play"  width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="icon-pause" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <button class="btn" id="btn-next" title="Siguiente">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 18l8.5-6L6 6v12zm2.5-6 5.5 4V8l-5.5 4zM16 6h2v12h-2z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="volume-row">
+      <svg class="vol-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+      </svg>
+      <input type="range" id="volume-slider" min="0" max="100" value="80"/>
+    </div>
+
+    <div id="status">Cargando playlist…</div>
+
+  </div>
+</div>
+
+<!-- WIDGET API DE SOUNDCLOUD -->
+<script src="https://w.soundcloud.com/player/api.js"></script>
+<script>
+(function () {
+  /* ── Playlist hardcodeada ─────────────────────────────── */
+  var PLAYLIST_URL = 'https://soundcloud.com/demoscott177/sets/electronic-house-electronica';
+
+  /* ── Referencias DOM ──────────────────────────────────── */
+  var iframe    = document.getElementById('sc-iframe');
+  var bgArt     = document.getElementById('bg-art');
+  var artworkEl = document.getElementById('artwork');
+  var titleEl   = document.getElementById('track-title');
+  var artistEl  = document.getElementById('track-artist');
+  var btnPlay   = document.getElementById('btn-play');
+  var iconPlay  = document.getElementById('icon-play');
+  var iconPause = document.getElementById('icon-pause');
+  var btnPrev   = document.getElementById('btn-prev');
+  var btnNext   = document.getElementById('btn-next');
+  var progFill  = document.getElementById('progress-fill');
+  var timeCur   = document.getElementById('time-cur');
+  var timeDur   = document.getElementById('time-dur');
+  var volSlider = document.getElementById('volume-slider');
+  var statusEl  = document.getElementById('status');
+  var eqBars    = document.getElementById('eq-bars');
+  var npLabel   = document.getElementById('np-label');
+  var progBar   = document.getElementById('progress-bar');
+
+  var widget   = null;
+  var duration = 0;
+  var ready    = false;
+
+  /* ── Helpers ──────────────────────────────────────────── */
+  function fmt(ms) {
+    var s = Math.floor(ms / 1000);
+    return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2);
+  }
+
+  function setStatus(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className   = cls || '';
+  }
+
+  function setArtwork(url) {
+    if (!url) return;
+    var big = url.replace(/-large|-small|-tiny|-mini|-crop|-t67x67|-badge/g, '-t500x500');
+    artworkEl.style.opacity = '0';
+    setTimeout(function () {
+      artworkEl.src = big;
+      bgArt.style.backgroundImage = "url('" + big + "')";
+      artworkEl.style.opacity = '1';
+    }, 350);
+  }
+
+  function setPlaying(playing) {
+    iconPlay.style.display  = playing ? 'none'  : 'block';
+    iconPause.style.display = playing ? 'block' : 'none';
+    eqBars.classList.toggle('playing', playing);
+    npLabel.textContent = playing ? 'Reproduciendo' : 'En pausa';
+    setStatus(playing ? '▶  TRANSMITIENDO' : '⏸  PAUSADO', playing ? 'active' : '');
+  }
+
+  /* ── Cargar widget ────────────────────────────────────── */
+  function initWidget() {
+    var src = 'https://w.soundcloud.com/player/?url='
+      + encodeURIComponent(PLAYLIST_URL)
+      + '&auto_play=false&hide_related=true&show_comments=false'
+      + '&show_user=true&show_reposts=false&visual=false'
+      + '&buying=false&sharing=false&download=false'
+      + '&show_artwork=false&color=%23ff2d78';
+
+    iframe.src = src;
+    setStatus('Conectando con SoundCloud…', '');
+
+    iframe.onload = function () {
+      try {
+        widget = SC.Widget(iframe);
+
+        widget.bind(SC.Widget.Events.READY, function () {
+          ready = true;
+          widget.setVolume(parseInt(volSlider.value, 10));
+          setStatus('¡Listo!  Pulsa  ▶  para reproducir', 'active');
+        });
+
+        widget.bind(SC.Widget.Events.PLAY, function () {
+          setPlaying(true);
+          widget.getCurrentSound(function (sound) {
+            if (!sound) return;
+            titleEl.textContent  = sound.title || '—';
+            artistEl.textContent =
+              (sound.publisher_metadata && sound.publisher_metadata.artist)
+              || (sound.user && sound.user.username) || '—';
+            var art = sound.artwork_url || (sound.user && sound.user.avatar_url);
+            if (art) setArtwork(art);
+            widget.getDuration(function (d) {
+              duration = d;
+              timeDur.textContent = fmt(d);
+            });
+          });
+        });
+
+        widget.bind(SC.Widget.Events.PAUSE,  function () { setPlaying(false); });
+        widget.bind(SC.Widget.Events.FINISH, function () { setPlaying(false); setStatus('Fin de pista', ''); });
+        widget.bind(SC.Widget.Events.ERROR,  function () { setStatus('Error al cargar la pista', 'error'); });
+
+        widget.bind(SC.Widget.Events.PLAY_PROGRESS, function (e) {
+          if (!duration) return;
+          progFill.style.width = (e.currentPosition / duration * 100) + '%';
+          timeCur.textContent  = fmt(e.currentPosition);
+        });
+
+      } catch (err) {
+        setStatus('Error: ' + err.message, 'error');
+        console.error(err);
+      }
+    };
+  }
+
+  /* ── Controles ────────────────────────────────────────── */
+  btnPlay.addEventListener('click', function () {
+    if (!widget || !ready) return;
+    widget.isPaused(function (paused) {
+      paused ? widget.play() : widget.pause();
+    });
+  });
+
+  btnNext.addEventListener('click', function () { if (widget && ready) widget.next(); });
+  btnPrev.addEventListener('click', function () { if (widget && ready) widget.prev(); });
+
+  volSlider.addEventListener('input', function () {
+    if (widget && ready) widget.setVolume(parseInt(this.value, 10));
+  });
+
+  progBar.addEventListener('click', function (e) {
+    if (!widget || !ready || !duration) return;
+    var r = progBar.getBoundingClientRect();
+    widget.seekTo((e.clientX - r.left) / r.width * duration);
+  });
+
+  /* ── Arrancar ─────────────────────────────────────────── */
+  initWidget();
+
+})();
+</script>
+</body>
+</html>
