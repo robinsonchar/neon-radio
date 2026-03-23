@@ -1,102 +1,154 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NEON RADIO</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
       --neon-pink:   #ff2d78;
       --neon-cyan:   #00f5ff;
       --neon-purple: #bf00ff;
       --bg-dark:     #06000f;
-      --glow-pink:   0 0 8px #ff2d78, 0 0 20px #ff2d7888, 0 0 40px #ff2d7844;
-      --glow-cyan:   0 0 8px #00f5ff, 0 0 20px #00f5ff88, 0 0 40px #00f5ff44;
+      --glow-pink:   0 0 8px #ff2d78, 0 0 22px #ff2d7888, 0 0 44px #ff2d7844;
+      --glow-cyan:   0 0 8px #00f5ff, 0 0 22px #00f5ff88, 0 0 44px #00f5ff44;
+      --card-w:      480px;
     }
-    html, body { height: 100%; background: var(--bg-dark); color: #fff; font-family: 'Share Tech Mono', monospace; overflow: hidden; }
 
-    /* ── FONDO DIFUMINADO ── */
+    html { height: 100%; }
+    body {
+      min-height: 100%;
+      background: var(--bg-dark);
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      overflow-x: hidden;
+    }
+
+    /* ── FONDO DIFUMINADO ─────────────────────────────────────── */
     #bg-art {
       position: fixed; inset: 0; z-index: 0;
       background-size: cover; background-position: center;
-      filter: blur(48px) brightness(0.32) saturate(1.8);
+      filter: blur(52px) brightness(0.3) saturate(1.9);
       transform: scale(1.1);
-      transition: background-image 1.4s ease;
+      transition: background-image 1.5s ease;
     }
     #bg-overlay {
       position: fixed; inset: 0; z-index: 1;
       background: linear-gradient(180deg,
-        rgba(6,0,15,0.6) 0%,
-        rgba(13,0,32,0.25) 40%,
-        rgba(6,0,15,0.9) 100%);
+        rgba(6,0,15,0.62) 0%,
+        rgba(13,0,32,0.22) 40%,
+        rgba(6,0,15,0.92) 100%);
     }
 
-    /* ── GRID RETROWAVE ── */
-    #grid { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+    /* ── GRID RETRO ───────────────────────────────────────────── */
+    #grid {
+      position: fixed; inset: 0; z-index: 2;
+      pointer-events: none; overflow: hidden;
+    }
     #grid svg { width: 100%; height: 100%; }
 
-    /* ── SCANLINES ── */
+    /* ── SCANLINES ────────────────────────────────────────────── */
     #scanlines {
       position: fixed; inset: 0; z-index: 3; pointer-events: none;
       background: repeating-linear-gradient(
-        0deg, rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 1px,
+        0deg,
+        rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 1px,
         transparent 1px, transparent 3px
       );
     }
 
-    /* ── LAYOUT ── */
+    /* ── LAYOUT PRINCIPAL ─────────────────────────────────────── */
     #app {
       position: relative; z-index: 10;
-      height: 100vh;
+      min-height: 100vh;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
+      padding: 24px 16px;
     }
 
-    /* ── LOGO ── */
+    /* ── LOGO ─────────────────────────────────────────────────── */
     .logo {
       font-family: 'Orbitron', sans-serif; font-weight: 900;
-      font-size: clamp(2rem, 5.5vw, 3.4rem);
+      font-size: clamp(1.9rem, 6vw, 3.4rem);
       letter-spacing: 0.2em; text-transform: uppercase;
       color: var(--neon-cyan); text-shadow: var(--glow-cyan);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       animation: flicker 9s infinite;
     }
     .logo span { color: var(--neon-pink); text-shadow: var(--glow-pink); }
     .tagline {
-      font-size: 0.68rem; letter-spacing: 0.38em;
-      color: rgba(255,255,255,0.35); text-transform: uppercase;
-      margin-bottom: 36px;
+      font-size: clamp(0.55rem, 2vw, 0.68rem);
+      letter-spacing: 0.35em;
+      color: rgba(255,255,255,0.33);
+      text-transform: uppercase;
+      margin-bottom: clamp(20px, 4vh, 36px);
+      text-align: center;
     }
 
-    /* ── CARD ── */
+    /* ── CARD ─────────────────────────────────────────────────── */
     .card {
-      background: rgba(10, 0, 26, 0.76);
-      border: 1px solid rgba(0,245,255,0.22);
-      border-radius: 4px;
+      background: rgba(10, 0, 26, 0.78);
+      border: 1px solid rgba(0,245,255,0.2);
+      border-radius: 6px;
       box-shadow:
         0 0 0 1px rgba(191,0,255,0.1),
         inset 0 0 50px rgba(0,0,0,0.45),
         0 12px 70px rgba(0,0,0,0.75);
-      padding: 30px 34px 26px;
-      width: min(480px, 93vw);
-      display: flex; flex-direction: column; align-items: center; gap: 18px;
-      backdrop-filter: blur(14px);
+      padding: clamp(20px, 4vw, 32px) clamp(18px, 5vw, 36px) clamp(18px, 3vw, 28px);
+      width: min(var(--card-w), 100%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: clamp(14px, 2.5vw, 20px);
+      backdrop-filter: blur(16px);
       position: relative; overflow: hidden;
     }
     .card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-purple), transparent);
-      opacity: 0.65;
+      opacity: 0.6;
     }
 
-    /* ── ARTWORK ── */
+    /* ── AHORA REPRODUCIENDO ──────────────────────────────────── */
+    .now-playing-row {
+      display: flex; align-items: center; gap: 9px;
+      width: 100%; justify-content: center;
+    }
+    #np-label {
+      font-size: clamp(0.55rem, 2vw, 0.6rem);
+      letter-spacing: 0.28em; color: rgba(255,255,255,0.22);
+      text-transform: uppercase;
+    }
+
+    /* ── EQ BARS ──────────────────────────────────────────────── */
+    .eq { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+    .eq-bar {
+      width: 3px; background: var(--neon-cyan); border-radius: 1px;
+      animation: eq-anim 0.8s ease-in-out infinite alternate; opacity: 0.32;
+    }
+    .eq-bar:nth-child(1){animation-duration:0.58s;}
+    .eq-bar:nth-child(2){animation-duration:0.84s;animation-delay:0.11s;}
+    .eq-bar:nth-child(3){animation-duration:0.5s; animation-delay:0.22s;}
+    .eq-bar:nth-child(4){animation-duration:0.7s; animation-delay:0.06s;}
+    .eq.playing .eq-bar { opacity: 1; box-shadow: 0 0 5px var(--neon-cyan); }
+    @keyframes eq-anim { from{height:3px;} to{height:14px;} }
+
+    /* ── ARTWORK + INFO (fila en pantallas anchas) ────────────── */
+    .media-row {
+      display: flex; align-items: center;
+      gap: clamp(14px, 3vw, 24px);
+      width: 100%;
+    }
+
     .artwork-wrap {
-      width: 155px; height: 155px; border-radius: 3px; overflow: hidden;
-      border: 1px solid rgba(255,45,120,0.45);
-      box-shadow: 0 0 28px rgba(255,45,120,0.28), 0 0 70px rgba(0,0,0,0.65);
-      position: relative; flex-shrink: 0;
+      flex-shrink: 0;
+      width: clamp(90px, 22vw, 148px);
+      height: clamp(90px, 22vw, 148px);
+      border-radius: 4px; overflow: hidden;
+      border: 1px solid rgba(255,45,120,0.42);
+      box-shadow: 0 0 26px rgba(255,45,120,0.26), 0 0 70px rgba(0,0,0,0.6);
+      position: relative;
     }
     #artwork {
       width: 100%; height: 100%; object-fit: cover; display: block;
@@ -108,55 +160,70 @@
       pointer-events: none;
     }
 
-    /* ── TRACK INFO ── */
-    .track-info { width: 100%; text-align: center; }
+    .track-info { flex: 1; min-width: 0; text-align: left; }
     #track-title {
       font-family: 'Orbitron', sans-serif; font-weight: 700;
-      font-size: 0.88rem; letter-spacing: 0.07em; color: #fff;
-      text-shadow: 0 0 12px rgba(255,255,255,0.28);
+      font-size: clamp(0.72rem, 2.5vw, 0.9rem);
+      letter-spacing: 0.06em; color: #fff;
+      text-shadow: 0 0 12px rgba(255,255,255,0.25);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       margin-bottom: 5px;
     }
     #track-artist {
-      font-size: 0.69rem; letter-spacing: 0.22em;
-      color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,45,120,0.55);
+      font-size: clamp(0.6rem, 2vw, 0.7rem);
+      letter-spacing: 0.2em; color: var(--neon-pink);
+      text-shadow: 0 0 8px rgba(255,45,120,0.5);
       text-transform: uppercase;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 8px;
+    }
+    #track-index {
+      font-size: 0.58rem; letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.2);
     }
 
-    /* ── PROGRESS ── */
+    /* ── PROGRESS ─────────────────────────────────────────────── */
     .progress-wrap { width: 100%; }
     .progress-bar-bg {
       width: 100%; height: 3px;
       background: rgba(255,255,255,0.09);
-      border-radius: 2px; cursor: pointer; position: relative;
+      border-radius: 2px; cursor: pointer;
     }
     #progress-fill {
       height: 100%; width: 0%;
       background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
-      box-shadow: 0 0 8px var(--neon-pink);
+      box-shadow: 0 0 9px var(--neon-pink);
       border-radius: 2px; transition: width 0.5s linear;
     }
     .time-row {
       display: flex; justify-content: space-between;
-      margin-top: 5px; font-size: 0.61rem;
-      color: rgba(255,255,255,0.3); letter-spacing: 0.1em;
+      margin-top: 5px; font-size: 0.6rem;
+      color: rgba(255,255,255,0.28); letter-spacing: 0.1em;
     }
 
-    /* ── CONTROLS ── */
-    .controls { display: flex; align-items: center; gap: 22px; }
+    /* ── CONTROLES ────────────────────────────────────────────── */
+    .controls {
+      display: flex; align-items: center;
+      gap: clamp(12px, 3vw, 22px);
+    }
     .btn {
       background: none; border: none; cursor: pointer;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.48);
       transition: color 0.2s, transform 0.15s;
-      padding: 4px; display: flex; align-items: center; justify-content: center;
+      padding: 6px;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
     }
-    .btn:hover { color: #fff; transform: scale(1.12); }
+    .btn:hover  { color: #fff; transform: scale(1.12); }
+    .btn:active { transform: scale(0.95); }
+
     .btn.play-btn {
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 1.5px solid rgba(255,45,120,0.45);
+      width: clamp(48px, 12vw, 56px);
+      height: clamp(48px, 12vw, 56px);
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,45,120,0.42);
       color: var(--neon-pink);
-      box-shadow: 0 0 18px rgba(255,45,120,0.2), inset 0 0 18px rgba(255,45,120,0.05);
+      box-shadow: 0 0 18px rgba(255,45,120,0.18), inset 0 0 18px rgba(255,45,120,0.05);
       transition: all 0.2s;
     }
     .btn.play-btn:hover {
@@ -165,58 +232,66 @@
       transform: scale(1.07);
     }
 
-    /* ── VOLUME ── */
+    /* Botón shuffle activo */
+    .btn.shuffle-btn { position: relative; }
+    .btn.shuffle-btn.on { color: var(--neon-cyan); }
+    .btn.shuffle-btn.on svg { filter: drop-shadow(0 0 5px var(--neon-cyan)); }
+    .btn.shuffle-btn .dot {
+      position: absolute; bottom: 2px;
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 5px var(--neon-cyan);
+      display: none;
+    }
+    .btn.shuffle-btn.on .dot { display: block; }
+
+    /* ── VOLUMEN ──────────────────────────────────────────────── */
     .volume-row { width: 100%; display: flex; align-items: center; gap: 10px; }
-    .vol-icon { color: rgba(255,255,255,0.3); flex-shrink: 0; }
+    .vol-icon { color: rgba(255,255,255,0.28); flex-shrink: 0; }
     #volume-slider {
       flex: 1; -webkit-appearance: none;
       height: 3px; background: rgba(255,255,255,0.1);
       border-radius: 2px; outline: none; cursor: pointer;
     }
     #volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 12px; height: 12px;
-      border-radius: 50%; background: var(--neon-cyan);
+      -webkit-appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--neon-cyan);
       box-shadow: 0 0 7px var(--neon-cyan); cursor: pointer;
     }
 
-    /* ── STATUS ── */
+    /* ── STATUS ───────────────────────────────────────────────── */
     #status {
-      font-size: 0.61rem; letter-spacing: 0.22em;
-      color: rgba(255,255,255,0.25); text-transform: uppercase; min-height: 14px;
+      font-size: clamp(0.58rem, 2vw, 0.62rem);
+      letter-spacing: 0.2em; color: rgba(255,255,255,0.22);
+      text-transform: uppercase; min-height: 14px;
+      text-align: center;
     }
     #status.active { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
     #status.error  { color: #ff6b6b; }
 
-    /* ── EQ BARS ── */
-    .now-playing-row {
-      display: flex; align-items: center; gap: 8px;
-      width: 100%; justify-content: center;
+    /* ── IFRAME OCULTO ────────────────────────────────────────── */
+    #sc-wrap {
+      position: fixed; top: -9999px; left: -9999px;
+      width: 1px; height: 1px; overflow: hidden;
     }
-    #np-label { font-size: 0.59rem; letter-spacing: 0.28em; color: rgba(255,255,255,0.22); text-transform: uppercase; }
-    .eq { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
-    .eq-bar {
-      width: 3px; background: var(--neon-cyan); border-radius: 1px;
-      animation: eq-anim 0.8s ease-in-out infinite alternate; opacity: 0.35;
-    }
-    .eq-bar:nth-child(1){animation-duration:0.6s;}
-    .eq-bar:nth-child(2){animation-duration:0.85s;animation-delay:0.1s;}
-    .eq-bar:nth-child(3){animation-duration:0.5s;animation-delay:0.2s;}
-    .eq-bar:nth-child(4){animation-duration:0.7s;animation-delay:0.05s;}
-    .eq.playing .eq-bar { opacity: 1; box-shadow: 0 0 5px var(--neon-cyan); }
-    @keyframes eq-anim { from{height:3px;} to{height:14px;} }
 
-    /* ── IFRAME OCULTO ── */
-    #sc-wrap { position: fixed; top:-9999px; left:-9999px; width:1px; height:1px; overflow:hidden; }
-
-    /* ── ANIMACIONES ── */
+    /* ── ANIMACIONES ──────────────────────────────────────────── */
     @keyframes flicker {
-      0%,95%,100%{opacity:1;} 96%{opacity:0.82;} 97%{opacity:1;} 98.5%{opacity:0.68;} 99%{opacity:1;}
+      0%,94%,100%{opacity:1;} 95%{opacity:0.8;} 96%{opacity:1;} 98%{opacity:0.65;} 99%{opacity:1;}
+    }
+
+    /* ── RESPONSIVE: pantallas muy pequeñas ───────────────────── */
+    @media (max-width: 380px) {
+      .media-row { flex-direction: column; align-items: center; }
+      .track-info { text-align: center; }
+      #track-title, #track-artist { white-space: normal; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-<!-- CAPAS DE FONDO -->
+<!-- FONDO -->
 <div id="bg-art"></div>
 <div id="bg-overlay"></div>
 
@@ -226,11 +301,10 @@
     <defs>
       <linearGradient id="gfade" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%"   stop-color="#00f5ff" stop-opacity="0"/>
-        <stop offset="55%"  stop-color="#00f5ff" stop-opacity="0.16"/>
-        <stop offset="100%" stop-color="#bf00ff" stop-opacity="0.38"/>
+        <stop offset="55%"  stop-color="#00f5ff" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#bf00ff" stop-opacity="0.36"/>
       </linearGradient>
     </defs>
-    <!-- Horizontales con perspectiva -->
     <g stroke="url(#gfade)" stroke-width="0.6">
       <line x1="0"   y1="900" x2="1440" y2="900"/>
       <line x1="0"   y1="845" x2="1440" y2="845"/>
@@ -244,9 +318,7 @@
       <line x1="424" y1="620" x2="1016" y2="620"/>
       <line x1="458" y1="608" x2="982"  y2="608"/>
       <line x1="490" y1="597" x2="950"  y2="597"/>
-      <line x1="520" y1="588" x2="920"  y2="588"/>
     </g>
-    <!-- Verticales con perspectiva -->
     <g stroke="url(#gfade)" stroke-width="0.5">
       <line x1="720" y1="582" x2="0"    y2="900"/>
       <line x1="720" y1="582" x2="1440" y2="900"/>
@@ -261,19 +333,20 @@
       <line x1="720" y1="582" x2="580"  y2="900"/>
       <line x1="720" y1="582" x2="860"  y2="900"/>
     </g>
-    <!-- Línea horizonte neón -->
-    <line x1="0" y1="580" x2="1440" y2="580" stroke="#ff2d78" stroke-width="1.2" opacity="0.55"/>
-    <line x1="0" y1="582" x2="1440" y2="582" stroke="#ff2d78" stroke-width="0.4" opacity="0.25"/>
+    <line x1="0" y1="580" x2="1440" y2="580" stroke="#ff2d78" stroke-width="1.2" opacity="0.52"/>
+    <line x1="0" y1="582" x2="1440" y2="582" stroke="#ff2d78" stroke-width="0.4" opacity="0.22"/>
   </svg>
 </div>
 <div id="scanlines"></div>
 
-<!-- IFRAME SOUNDCLOUD (OCULTO) -->
+<!-- IFRAME SOUNDCLOUD OCULTO -->
 <div id="sc-wrap">
-  <iframe id="sc-iframe" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="about:blank"></iframe>
+  <iframe id="sc-iframe" width="100%" height="166"
+    scrolling="no" frameborder="no" allow="autoplay"
+    src="about:blank"></iframe>
 </div>
 
-<!-- UI PRINCIPAL -->
+<!-- UI -->
 <div id="app">
   <div class="logo">NEON <span>RADIO</span></div>
   <div class="tagline">◈ electronic · house · electronica ◈</div>
@@ -290,17 +363,21 @@
       <span id="np-label">En espera</span>
     </div>
 
-    <div class="artwork-wrap">
-      <img id="artwork"
-        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect fill='%23100020'/%3E%3Ctext x='80' y='90' text-anchor='middle' fill='%23bf00ff' font-size='52' font-family='serif'%3E%E2%99%AB%3C/text%3E%3C/svg%3E"
-        alt="Portada"/>
+    <!-- ARTWORK + INFO EN FILA -->
+    <div class="media-row">
+      <div class="artwork-wrap">
+        <img id="artwork"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect fill='%23100020'/%3E%3Ctext x='80' y='92' text-anchor='middle' fill='%23bf00ff' font-size='54' font-family='serif'%3E%E2%99%AB%3C/text%3E%3C/svg%3E"
+          alt="Portada"/>
+      </div>
+      <div class="track-info">
+        <div id="track-title">— INICIANDO —</div>
+        <div id="track-artist">NEON RADIO</div>
+        <div id="track-index"></div>
+      </div>
     </div>
 
-    <div class="track-info">
-      <div id="track-title">— INICIANDO —</div>
-      <div id="track-artist">NEON RADIO</div>
-    </div>
-
+    <!-- PROGRESO -->
     <div class="progress-wrap">
       <div class="progress-bar-bg" id="progress-bar">
         <div id="progress-fill"></div>
@@ -311,23 +388,40 @@
       </div>
     </div>
 
+    <!-- CONTROLES -->
     <div class="controls">
+
+      <!-- Shuffle -->
+      <button class="btn shuffle-btn on" id="btn-shuffle" title="Aleatorio">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17zm4.76-.82 3.65 3.65-3.65 3.65V13h-.08c-1.17 0-2.31.48-3.14 1.33L9 17.34A4.419 4.419 0 0 1 5.92 18.5H4v2h1.92c1.5 0 2.94-.59 4-1.66l3.08-3.08c.48-.48 1.13-.76 1.83-.76H15v-2.17l3.59 3.59L20 15l-5-5-4.41 4.41-1.42-1.41 4.42-4.42c.48-.48 1.13-.76 1.83-.76H15V5.17l5 5L21.41 9 15 2.58v2.59h-.08c-1.5 0-2.94.59-4 1.66z"/>
+        </svg>
+        <span class="dot"></span>
+      </button>
+
+      <!-- Anterior -->
       <button class="btn" id="btn-prev" title="Anterior">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
           <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
         </svg>
       </button>
+
+      <!-- Play / Pause -->
       <button class="btn play-btn" id="btn-play" title="Reproducir / Pausar">
         <svg id="icon-play"  width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         <svg id="icon-pause" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
       </button>
+
+      <!-- Siguiente -->
       <button class="btn" id="btn-next" title="Siguiente">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
           <path d="M6 18l8.5-6L6 6v12zm2.5-6 5.5 4V8l-5.5 4zM16 6h2v12h-2z"/>
         </svg>
       </button>
+
     </div>
 
+    <!-- VOLUMEN -->
     <div class="volume-row">
       <svg class="vol-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
         <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
@@ -340,38 +434,53 @@
   </div>
 </div>
 
-<!-- WIDGET API DE SOUNDCLOUD -->
 <script src="https://w.soundcloud.com/player/api.js"></script>
 <script>
 (function () {
-  /* ── Playlist hardcodeada ─────────────────────────────── */
+
+  /* ════════════════════════════════════════════════════════
+     CONFIGURACIÓN
+  ════════════════════════════════════════════════════════ */
   var PLAYLIST_URL = 'https://soundcloud.com/demoscott177/sets/electronic-house-electronica';
 
-  /* ── Referencias DOM ──────────────────────────────────── */
-  var iframe    = document.getElementById('sc-iframe');
-  var bgArt     = document.getElementById('bg-art');
-  var artworkEl = document.getElementById('artwork');
-  var titleEl   = document.getElementById('track-title');
-  var artistEl  = document.getElementById('track-artist');
-  var btnPlay   = document.getElementById('btn-play');
-  var iconPlay  = document.getElementById('icon-play');
-  var iconPause = document.getElementById('icon-pause');
-  var btnPrev   = document.getElementById('btn-prev');
-  var btnNext   = document.getElementById('btn-next');
-  var progFill  = document.getElementById('progress-fill');
-  var timeCur   = document.getElementById('time-cur');
-  var timeDur   = document.getElementById('time-dur');
-  var volSlider = document.getElementById('volume-slider');
-  var statusEl  = document.getElementById('status');
-  var eqBars    = document.getElementById('eq-bars');
-  var npLabel   = document.getElementById('np-label');
-  var progBar   = document.getElementById('progress-bar');
+  /* ════════════════════════════════════════════════════════
+     DOM
+  ════════════════════════════════════════════════════════ */
+  var iframe      = document.getElementById('sc-iframe');
+  var bgArt       = document.getElementById('bg-art');
+  var artworkEl   = document.getElementById('artwork');
+  var titleEl     = document.getElementById('track-title');
+  var artistEl    = document.getElementById('track-artist');
+  var indexEl     = document.getElementById('track-index');
+  var btnPlay     = document.getElementById('btn-play');
+  var iconPlay    = document.getElementById('icon-play');
+  var iconPause   = document.getElementById('icon-pause');
+  var btnPrev     = document.getElementById('btn-prev');
+  var btnNext     = document.getElementById('btn-next');
+  var btnShuffle  = document.getElementById('btn-shuffle');
+  var progFill    = document.getElementById('progress-fill');
+  var timeCur     = document.getElementById('time-cur');
+  var timeDur     = document.getElementById('time-dur');
+  var volSlider   = document.getElementById('volume-slider');
+  var statusEl    = document.getElementById('status');
+  var eqBars      = document.getElementById('eq-bars');
+  var npLabel     = document.getElementById('np-label');
+  var progBar     = document.getElementById('progress-bar');
 
-  var widget   = null;
-  var duration = 0;
-  var ready    = false;
+  /* ════════════════════════════════════════════════════════
+     ESTADO
+  ════════════════════════════════════════════════════════ */
+  var widget    = null;
+  var duration  = 0;
+  var ready     = false;
+  var shuffleOn = true;          // shuffle activo por defecto
+  var playlist  = [];            // copia de los tracks
+  var queue     = [];            // orden aleatorio a reproducir
+  var queuePos  = 0;             // posición actual en la queue
 
-  /* ── Helpers ──────────────────────────────────────────── */
+  /* ════════════════════════════════════════════════════════
+     HELPERS
+  ════════════════════════════════════════════════════════ */
   function fmt(ms) {
     var s = Math.floor(ms / 1000);
     return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2);
@@ -401,7 +510,49 @@
     setStatus(playing ? '▶  TRANSMITIENDO' : '⏸  PAUSADO', playing ? 'active' : '');
   }
 
-  /* ── Cargar widget ────────────────────────────────────── */
+  /* ════════════════════════════════════════════════════════
+     SHUFFLE — algoritmo Fisher-Yates
+  ════════════════════════════════════════════════════════ */
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildQueue(currentIndex) {
+    if (!shuffleOn) {
+      // sin shuffle: orden normal desde la posición actual
+      queue = [];
+      for (var i = 0; i < playlist.length; i++) queue.push(i);
+      queuePos = (currentIndex !== undefined) ? currentIndex : 0;
+    } else {
+      // con shuffle: orden aleatorio (el current va al frente si se especifica)
+      var indices = [];
+      for (var i = 0; i < playlist.length; i++) {
+        if (i !== currentIndex) indices.push(i);
+      }
+      queue = (currentIndex !== undefined)
+        ? [currentIndex].concat(shuffle(indices))
+        : shuffle(indices.concat(currentIndex !== undefined ? [] : []));
+      if (currentIndex === undefined) queue = shuffle(queue.concat ? queue : [].concat(queue));
+      queuePos = 0;
+    }
+  }
+
+  function playTrackAt(qPos) {
+    if (!widget || !ready) return;
+    queuePos = qPos;
+    if (queuePos < 0)              queuePos = queue.length - 1;
+    if (queuePos >= queue.length)  queuePos = 0;
+    widget.skip(queue[queuePos]);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     INICIALIZAR WIDGET
+  ════════════════════════════════════════════════════════ */
   function initWidget() {
     var src = 'https://w.soundcloud.com/player/?url='
       + encodeURIComponent(PLAYLIST_URL)
@@ -417,14 +568,29 @@
       try {
         widget = SC.Widget(iframe);
 
+        /* READY */
         widget.bind(SC.Widget.Events.READY, function () {
           ready = true;
           widget.setVolume(parseInt(volSlider.value, 10));
-          setStatus('¡Listo!  Pulsa  ▶  para reproducir', 'active');
+
+          // Obtener todos los tracks y construir la queue aleatoria
+          widget.getSounds(function (sounds) {
+            playlist = sounds || [];
+            buildQueue(); // shuffle inicial sin current definido
+            setStatus('¡Listo!  Pulsa  ▶  para reproducir', 'active');
+          });
         });
 
+        /* PLAY */
         widget.bind(SC.Widget.Events.PLAY, function () {
           setPlaying(true);
+          widget.getCurrentSoundIndex(function (idx) {
+            // Sincronizar queuePos con el índice real
+            for (var i = 0; i < queue.length; i++) {
+              if (queue[i] === idx) { queuePos = i; break; }
+            }
+            indexEl.textContent = 'Pista ' + (idx + 1) + ' / ' + playlist.length;
+          });
           widget.getCurrentSound(function (sound) {
             if (!sound) return;
             titleEl.textContent  = sound.title || '—';
@@ -440,10 +606,24 @@
           });
         });
 
-        widget.bind(SC.Widget.Events.PAUSE,  function () { setPlaying(false); });
-        widget.bind(SC.Widget.Events.FINISH, function () { setPlaying(false); setStatus('Fin de pista', ''); });
-        widget.bind(SC.Widget.Events.ERROR,  function () { setStatus('Error al cargar la pista', 'error'); });
+        /* PAUSA / FIN */
+        widget.bind(SC.Widget.Events.PAUSE, function () { setPlaying(false); });
 
+        /* Al terminar una pista → siguiente en la queue */
+        widget.bind(SC.Widget.Events.FINISH, function () {
+          setPlaying(false);
+          progFill.style.width = '0%';
+          timeCur.textContent  = '0:00';
+          setTimeout(function () {
+            playTrackAt(queuePos + 1);
+          }, 800);
+        });
+
+        widget.bind(SC.Widget.Events.ERROR, function () {
+          setStatus('Error al cargar la pista', 'error');
+        });
+
+        /* Progreso */
         widget.bind(SC.Widget.Events.PLAY_PROGRESS, function (e) {
           if (!duration) return;
           progFill.style.width = (e.currentPosition / duration * 100) + '%';
@@ -457,28 +637,79 @@
     };
   }
 
-  /* ── Controles ────────────────────────────────────────── */
+  /* ════════════════════════════════════════════════════════
+     CONTROLES
+  ════════════════════════════════════════════════════════ */
+
+  /* Play / Pause */
   btnPlay.addEventListener('click', function () {
     if (!widget || !ready) return;
     widget.isPaused(function (paused) {
-      paused ? widget.play() : widget.pause();
+      if (paused) {
+        // Si nunca arrancó, hacer skip al primer de la queue
+        widget.getPosition(function (pos) {
+          if (pos === 0) {
+            widget.skip(queue[0]);
+          } else {
+            widget.play();
+          }
+        });
+      } else {
+        widget.pause();
+      }
     });
   });
 
-  btnNext.addEventListener('click', function () { if (widget && ready) widget.next(); });
-  btnPrev.addEventListener('click', function () { if (widget && ready) widget.prev(); });
+  /* Siguiente (respeta queue) */
+  btnNext.addEventListener('click', function () {
+    if (!widget || !ready) return;
+    playTrackAt(queuePos + 1);
+  });
 
+  /* Anterior (respeta queue) */
+  btnPrev.addEventListener('click', function () {
+    if (!widget || !ready) return;
+    // Si llevamos más de 3 s en la pista, vuelve al inicio; si no, pista anterior
+    widget.getPosition(function (pos) {
+      if (pos > 3000) {
+        widget.seekTo(0);
+      } else {
+        playTrackAt(queuePos - 1);
+      }
+    });
+  });
+
+  /* Shuffle toggle */
+  btnShuffle.addEventListener('click', function () {
+    shuffleOn = !shuffleOn;
+    btnShuffle.classList.toggle('on', shuffleOn);
+
+    // Reconstruir la queue manteniendo la pista actual en la posición 0
+    widget && widget.getCurrentSoundIndex(function (idx) {
+      buildQueue(idx);
+    });
+
+    setStatus(shuffleOn ? 'Aleatorio: ON' : 'Aleatorio: OFF', 'active');
+    setTimeout(function () {
+      setStatus('▶  TRANSMITIENDO', 'active');
+    }, 1500);
+  });
+
+  /* Volumen */
   volSlider.addEventListener('input', function () {
     if (widget && ready) widget.setVolume(parseInt(this.value, 10));
   });
 
+  /* Seek en barra de progreso */
   progBar.addEventListener('click', function (e) {
     if (!widget || !ready || !duration) return;
     var r = progBar.getBoundingClientRect();
     widget.seekTo((e.clientX - r.left) / r.width * duration);
   });
 
-  /* ── Arrancar ─────────────────────────────────────────── */
+  /* ════════════════════════════════════════════════════════
+     ARRANCAR
+  ════════════════════════════════════════════════════════ */
   initWidget();
 
 })();
